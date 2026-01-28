@@ -3,278 +3,520 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clawdbot Commands - Kanban Board</title>
+    <title>Mo's Kanban Board</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-        
-        .board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        
-        .column {
+
+        /* LOGIN SCREEN */
+        .login-container {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
-            max-height: 600px;
+            gap: 20px;
         }
-        
-        .column-header {
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .login-container .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-container input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-container button {
+            padding: 12px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 1.1em;
-            text-align: center;
-            border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        
-        .column-content {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background: #f8f9fa;
+
+        .login-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
-        
-        .card {
-            background: white;
-            border-left: 4px solid #667eea;
+
+        .login-container button:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
             padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            cursor: grab;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            border-left: 4px solid #c00;
+            display: none;
         }
-        
-        .card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* KANBAN BOARD */
+        .board-container {
+            display: none;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .board-header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .board-header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .column {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 500px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .column-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            margin: -20px -20px 20px -20px;
+            padding: 15px 20px;
+        }
+
+        .column:nth-child(1) .column-header {
+            background: linear-gradient(135deg, #ee7752 0%, #e73c7e 100%);
+            border-color: #e73c7e;
+        }
+
+        .column:nth-child(2) .column-header {
+            background: linear-gradient(135deg, #23a6d5 0%, #23d5ab 100%);
+            border-color: #23d5ab;
+        }
+
+        .column:nth-child(3) .column-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-color: #f5576c;
+        }
+
+        .column:nth-child(4) .column-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-color: #00f2fe;
+        }
+
+        .task-count {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-left: 10px;
+        }
+
+        .tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 400px;
+        }
+
+        .task {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: move;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .task:nth-child(1) {
+            border-left-color: #ee7752;
+        }
+
+        .task:nth-child(2) {
+            border-left-color: #23a6d5;
+        }
+
+        .task:nth-child(3) {
+            border-left-color: #f093fb;
+        }
+
+        .task:nth-child(4) {
+            border-left-color: #4facfe;
+        }
+
+        .task:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
             transform: translateY(-2px);
         }
-        
-        .card-title {
-            font-weight: 600;
+
+        .task.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .task.drag-over {
+            background: #f0f0f0;
+            border: 2px dashed #667eea;
+        }
+
+        .task-text {
             color: #333;
-            margin-bottom: 5px;
-            font-size: 0.95em;
+            font-weight: 500;
+            font-size: 15px;
         }
-        
-        .card-description {
-            color: #666;
-            font-size: 0.85em;
-            line-height: 1.4;
-        }
-        
-        .card-priority {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.75em;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .priority-high {
-            background: #fee;
-            color: #c33;
-        }
-        
-        .priority-medium {
-            background: #fef3cd;
-            color: #856404;
-        }
-        
-        .priority-low {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .info-section {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-        
-        .info-section h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        
-        .info-section p {
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        
-        @media (max-width: 1200px) {
-            .board {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .board {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-            }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 40px 20px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🤖 Clawdbot Commands</h1>
-            <p>Kanban Board - Projekt Management</p>
+    <!-- LOGIN SCREEN -->
+    <div class="login-container" id="loginContainer">
+        <h1>Kanban Board</h1>
+        <p class="subtitle">Mo's Projektmanagement</p>
+        <div class="error-message" id="errorMessage"></div>
+        <input 
+            type="password" 
+            id="passwordInput" 
+            placeholder="Passwort eingeben..."
+            autocomplete="off"
+        >
+        <button onclick="handleLogin()">Anmelden</button>
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div class="board-container" id="boardContainer">
+        <div class="board-header">
+            <h1>Mo's Kanban Board</h1>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
         </div>
-        
-        <div class="board">
-            <!-- Nicht begonnen -->
+
+        <div class="kanban-board">
+            <!-- SPALTE 1: NICHT BEGONNEN -->
             <div class="column">
-                <div class="column-header">📋 Nicht begonnen</div>
-                <div class="column-content">
-                    <div class="card">
-                        <div class="card-title">Voice Commands Integration</div>
-                        <div class="card-description">Implementiere Voice-Befehle für Clawdbot</div>
-                        <span class="card-priority priority-high">Hoch</span>
+                <div class="column-header">
+                    Nicht begonnen
+                    <span class="task-count">(<span class="count">0</span>)</span>
+                </div>
+                <div class="tasks" data-column="0">
+                    <div class="task" draggable="true">
+                        <div class="task-text">Python lernen</div>
                     </div>
-                    <div class="card">
-                        <div class="card-title">API Documentation</div>
-                        <div class="card-description">Schreibe umfassende API Dokumentation</div>
-                        <span class="card-priority priority-medium">Mittel</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Plugin System</div>
-                        <div class="card-description">Entwickle ein Plugin-System für Erweiterungen</div>
-                        <span class="card-priority priority-medium">Mittel</span>
+                    <div class="task" draggable="true">
+                        <div class="task-text">Roblox Combat Game Scripting</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- In Arbeit -->
+
+            <!-- SPALTE 2: IN ARBEIT -->
             <div class="column">
-                <div class="column-header">⚙️ In Arbeit</div>
-                <div class="column-content">
-                    <div class="card">
-                        <div class="card-title">Performance Optimization</div>
-                        <div class="card-description">Optimiere Datenbank-Abfragen und Caching</div>
-                        <span class="card-priority priority-high">Hoch</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">User Authentication</div>
-                        <div class="card-description">Implementiere OAuth2 Authentifizierung</div>
-                        <span class="card-priority priority-high">Hoch</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Testing Framework</div>
-                        <div class="card-description">Erstelle Unit und Integration Tests</div>
-                        <span class="card-priority priority-medium">Mittel</span>
+                <div class="column-header">
+                    In Arbeit
+                    <span class="task-count">(<span class="count">0</span>)</span>
+                </div>
+                <div class="tasks" data-column="1">
+                    <div class="task" draggable="true">
+                        <div class="task-text">Fluglotsen-Vorbereitung (DFS)</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Under Review -->
+
+            <!-- SPALTE 3: UNDER REVIEW -->
             <div class="column">
-                <div class="column-header">👀 Under Review</div>
-                <div class="column-content">
-                    <div class="card">
-                        <div class="card-title">Dashboard Redesign</div>
-                        <div class="card-description">Neues, modernes Design für Dashboard</div>
-                        <span class="card-priority priority-medium">Mittel</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Mobile App Version</div>
-                        <div class="card-description">Responsive Mobile-optimierte Version</div>
-                        <span class="card-priority priority-low">Niedrig</span>
+                <div class="column-header">
+                    Under Review
+                    <span class="task-count">(<span class="count">0</span>)</span>
+                </div>
+                <div class="tasks" data-column="2">
+                    <div class="task" draggable="true">
+                        <div class="task-text">Clawdbot Projektmanagement</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Abgeschlossen -->
+
+            <!-- SPALTE 4: ABGESCHLOSSEN -->
             <div class="column">
-                <div class="column-header">✅ Abgeschlossen</div>
-                <div class="column-content">
-                    <div class="card">
-                        <div class="card-title">Basic Setup</div>
-                        <div class="card-description">Projekt-Grundstruktur erstellt</div>
-                        <span class="card-priority priority-low">Niedrig</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Database Schema</div>
-                        <div class="card-description">Datenbank-Schema designed und implementiert</div>
-                        <span class="card-priority priority-high">Hoch</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">REST API</div>
-                        <div class="card-description">Basis REST API Endpoints implementiert</div>
-                        <span class="card-priority priority-high">Hoch</span>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">CI/CD Pipeline</div>
-                        <div class="card-description">GitHub Actions Workflow konfiguriert</div>
-                        <span class="card-priority priority-medium">Mittel</span>
+                <div class="column-header">
+                    Abgeschlossen
+                    <span class="task-count">(<span class="count">0</span>)</span>
+                </div>
+                <div class="tasks" data-column="3">
+                    <div class="task" draggable="true">
+                        <div class="task-text">Wordle Java Game</div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="info-section">
-            <h2>📊 Über dieses Kanban Board</h2>
-            <p><strong>Projekt:</strong> Clawdbot Commands Management System</p>
-            <p><strong>Status:</strong> In aktiver Entwicklung</p>
-            <p><strong>Letztes Update:</strong> <span id="date"></span></p>
-            <p style="margin-top: 20px;">Dieses Kanban Board verfolgt den Fortschritt der verschiedenen Aufgaben und Features. Die Spalten zeigen den aktuellen Status jeder Aufgabe: von "Nicht begonnen" über "In Arbeit" und "Under Review" bis "Abgeschlossen".</p>
         </div>
     </div>
-    
+
     <script>
-        // Aktuelles Datum anzeigen
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        const today = new Date().toLocaleDateString('de-DE', options);
-        document.getElementById('date').textContent = today;
+        const CORRECT_PASSWORD = 'Clawdbot-Commands_nabald';
+        const LOGIN_KEY = 'kanban_authenticated';
+
+        function handleLogin() {
+            const passwordInput = document.getElementById('passwordInput');
+            const password = passwordInput.value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (password === CORRECT_PASSWORD) {
+                localStorage.setItem(LOGIN_KEY, 'true');
+                showBoard();
+                loadFromLocalStorage();
+                errorMessage.classList.remove('show');
+            } else {
+                errorMessage.textContent = 'Falsches Passwort!';
+                errorMessage.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem(LOGIN_KEY);
+            showLogin();
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('boardContainer').style.display = 'none';
+        }
+
+        function showBoard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('boardContainer').style.display = 'block';
+        }
+
+        window.addEventListener('load', () => {
+            if (localStorage.getItem(LOGIN_KEY) === 'true') {
+                showBoard();
+                loadFromLocalStorage();
+            } else {
+                showLogin();
+                document.getElementById('passwordInput').focus();
+            }
+            initializeDragDrop();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+        });
+
+        let draggedTask = null;
+
+        function initializeDragDrop() {
+            const tasks = document.querySelectorAll('.task');
+            const taskContainers = document.querySelectorAll('.tasks');
+
+            tasks.forEach(task => {
+                task.addEventListener('dragstart', handleDragStart);
+                task.addEventListener('dragend', handleDragEnd);
+            });
+
+            taskContainers.forEach(container => {
+                container.addEventListener('dragover', handleDragOver);
+                container.addEventListener('drop', handleDrop);
+                container.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedTask = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.tasks').forEach(container => {
+                container.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            if (e.target === this) {
+                this.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            this.classList.remove('drag-over');
+            
+            if (draggedTask && draggedTask.parentElement !== this) {
+                this.appendChild(draggedTask);
+                updateTaskCounts();
+                saveToLocalStorage();
+            }
+            draggedTask = null;
+        }
+
+        function updateTaskCounts() {
+            const columns = document.querySelectorAll('.column');
+            columns.forEach(column => {
+                const count = column.querySelector('.tasks').children.length;
+                column.querySelector('.task-count .count').textContent = count;
+            });
+        }
+
+        function saveToLocalStorage() {
+            const data = [];
+            document.querySelectorAll('.tasks').forEach((container) => {
+                const tasks = [];
+                container.querySelectorAll('.task').forEach(task => {
+                    tasks.push(task.querySelector('.task-text').textContent);
+                });
+                data.push(tasks);
+            });
+            localStorage.setItem('kanban_tasks', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('kanban_tasks');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    const containers = document.querySelectorAll('.tasks');
+                    
+                    containers.forEach(container => {
+                        container.innerHTML = '';
+                    });
+                    
+                    data.forEach((tasks, colIndex) => {
+                        tasks.forEach(taskText => {
+                            const taskEl = document.createElement('div');
+                            taskEl.className = 'task';
+                            taskEl.draggable = true;
+                            taskEl.innerHTML = `<div class="task-text">${escapeHtml(taskText)}</div>`;
+                            containers[colIndex].appendChild(taskEl);
+                            
+                            taskEl.addEventListener('dragstart', handleDragStart);
+                            taskEl.addEventListener('dragend', handleDragEnd);
+                        });
+                    });
+                    
+                    initializeDragDrop();
+                    updateTaskCounts();
+                } catch (e) {
+                    console.error('Fehler:', e);
+                }
+            } else {
+                updateTaskCounts();
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
     </script>
 </body>
 </html>
